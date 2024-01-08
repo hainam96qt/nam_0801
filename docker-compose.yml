@@ -1,0 +1,31 @@
+version: "3.4"
+
+networks:
+  cas-network:
+    driver: bridge
+
+services:
+  postgres-db:
+    image: postgres:12-alpine
+    restart: on-failure
+    environment:
+      POSTGRES_DB: namdb
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+    ports:
+      - "5432:5432"
+    volumes:
+      - ~/volumes/postgres_db:/var/lib/postgres_db
+
+#  nam-0508:
+#    build:
+#      dockerfile: Dockerfile
+#    restart: on-failure
+#    container_name: nam-0508
+#    volumes:
+#      - ./config:/app/config
+#    hostname: nam-0508
+#    depends_on:
+#      - postgres-db
+#    ports:
+#      - "8000:8000"
