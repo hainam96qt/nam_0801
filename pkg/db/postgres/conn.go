@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/lib/pq"
 )
 
 type DatabaseConfig struct {
@@ -17,7 +17,7 @@ type DatabaseConfig struct {
 }
 
 func ConnectDatabase(args DatabaseConfig) (*sql.DB, error) {
-	var con = fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable\"", args.Host, args.Port, args.Username, args.DatabaseName, args.Password)
+	var con = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", args.Username, args.Password, args.Host, args.Port, args.DatabaseName)
 	db, err := sql.Open("postgres", con)
 	if err != nil {
 		log.Print(err.Error())
