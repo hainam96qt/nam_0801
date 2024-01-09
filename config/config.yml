@@ -18,7 +18,7 @@ server:
   uploadSizeLimitByte: 5242880
 
 postgres:
-  host: localhost
+  host: postgres-db
   port: 5432
   database: namdb
   user: user
