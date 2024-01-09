@@ -38,7 +38,7 @@ func convertTransactionsDBToAPI(trans []db.Transaction, accounts []db.Account) [
 		mapAccountByID[v.ID] = accounts[k]
 	}
 
-	var result []model.Transaction
+	result := []model.Transaction{}
 	for _, v := range trans {
 		result = append(result, convertTransactionDBToAPI(v, mapAccountByID[v.AccountID]))
 	}

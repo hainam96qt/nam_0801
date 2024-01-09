@@ -18,7 +18,7 @@ type (
 	}
 
 	AccountService interface {
-		CreateAccount(ctx context.Context, req *model.CreateAccountRequest) (*model.CreateAccountResponse, error)
+		CreateAccount(ctx context.Context, userID int32, req *model.CreateAccountRequest) (*model.CreateAccountResponse, error)
 		ListAccount(ctx context.Context, userID int32) (*model.ListAccountsResponse, error)
 		GetAccount(ctx context.Context, userID int32, accountID int32) (*model.GetAccountResponse, error)
 	}
@@ -38,6 +38,13 @@ func InitAccountHandler(r *chi.Mux, accountSvc AccountService) {
 func (e Endpoint) createAccount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
+	if err != nil {
+		log.Printf("failed to get query 'page' for list transactions: %s \n", err)
+		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
+		return
+	}
+
 	var req model.CreateAccountRequest
 	if err := request.DecodeJSON(ctx, r.Body, &req); err != nil {
 		log.Printf("read request body error: %s \n", err)
@@ -45,9 +52,9 @@ func (e Endpoint) createAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := e.accountSvc.CreateAccount(ctx, &req)
+	res, err := e.accountSvc.CreateAccount(ctx, int32(userID), &req)
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to get list accounts: %s \n", err)
 		response.Error(w, err)
 		return
 	}
@@ -74,12 +81,12 @@ func (e Endpoint) getAccounts(w http.ResponseWriter, r *http.Request) {
 
 	res, err := e.accountSvc.GetAccount(ctx, int32(userID), int32(accountID))
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to get account: %s \n", err)
 		response.Error(w, err)
 		return
 	}
 
-	response.JSON(w, http.StatusCreated, res.Account)
+	response.JSON(w, http.StatusOK, res.Account)
 }
 
 func (e Endpoint) listAccounts(w http.ResponseWriter, r *http.Request) {
@@ -94,10 +101,10 @@ func (e Endpoint) listAccounts(w http.ResponseWriter, r *http.Request) {
 
 	res, err := e.accountSvc.ListAccount(ctx, int32(userID))
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to get list accountss: %s \n", err)
 		response.Error(w, err)
 		return
 	}
 
-	response.JSON(w, http.StatusCreated, res.Accounts)
+	response.JSON(w, http.StatusOK, res.Accounts)
 }

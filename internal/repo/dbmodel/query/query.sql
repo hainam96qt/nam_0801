@@ -10,9 +10,10 @@ INSERT INTO users (
 -- name: CreateAccount :one
 INSERT INTO accounts (
     name,
-    bank
+    bank,
+    user_id
 ) VALUES (
-    $1, $2
+    $1, $2, $3
  ) RETURNING *;
 
 -- name: CreateTransaction :one

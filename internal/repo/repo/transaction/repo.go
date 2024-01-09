@@ -43,9 +43,9 @@ SELECT
 FROM transactions ts join accounts ac on ts.account_id = ac.id
 WHERE
 	ac.user_id = {{.UserID}}
-	{{With .AccountID}}
+	{{with .AccountID}}
 		AND ac.id = {{.}}
-	{{End}}
+	{{end}}
 `
 
 func (r *Repository) ListTransactions(ctx context.Context, userID int32, accountID *int32) ([]db.Transaction, error) {

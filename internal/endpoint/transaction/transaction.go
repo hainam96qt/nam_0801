@@ -30,7 +30,6 @@ func InitTransactionHandler(r *chi.Mux, transactionSvc TransactionService) {
 	r.Route("/api/users/{user_id}", func(r chi.Router) {
 		r.Get("/transactions", transactionEndpoint.ListTransactions)
 		r.Post("/transactions", transactionEndpoint.createTransaction)
-
 	})
 }
 
@@ -45,7 +44,7 @@ func (e *Endpoint) ListTransactions(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var accountID int
-	accountIDStr := r.URL.Query().Get("accountID")
+	accountIDStr := r.URL.Query().Get("account_id")
 	if accountIDStr != "" {
 		accountID, err = strconv.Atoi(accountIDStr)
 		if err != nil {
@@ -57,7 +56,7 @@ func (e *Endpoint) ListTransactions(w http.ResponseWriter, r *http.Request) {
 
 	res, err := e.transactionSvc.ListTransactions(ctx, int32(userID), int32(accountID))
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to get list account: %s \n", err)
 		response.Error(w, err)
 		return
 	}
@@ -84,7 +83,7 @@ func (e *Endpoint) createTransaction(w http.ResponseWriter, r *http.Request) {
 
 	res, err := e.transactionSvc.CreateTransaction(ctx, int32(userID), &req)
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to create transaction: %s \n", err)
 		response.Error(w, err)
 		return
 	}

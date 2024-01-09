@@ -42,7 +42,7 @@ func (e *Endpoint) createUser(w http.ResponseWriter, r *http.Request) {
 
 	res, err := e.userSvc.CreateUser(ctx, &req)
 	if err != nil {
-		log.Printf("failed to get list wagers: %s \n", err)
+		log.Printf("failed to create user: %s \n", err)
 		response.Error(w, err)
 		return
 	}

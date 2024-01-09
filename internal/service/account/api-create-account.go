@@ -6,10 +6,11 @@ import (
 	db "nam_0801/internal/repo/dbmodel"
 )
 
-func (s *Service) CreateAccount(ctx context.Context, req *model.CreateAccountRequest) (*model.CreateAccountResponse, error) {
+func (s *Service) CreateAccount(ctx context.Context, userID int32, req *model.CreateAccountRequest) (*model.CreateAccountResponse, error) {
 	newAccount := db.CreateAccountParams{
-		Name: req.Name,
-		Bank: req.Bank,
+		Name:   req.Name,
+		Bank:   req.Bank,
+		UserID: userID,
 	}
 	a, err := s.accountRepo.CreateAccount(ctx, newAccount)
 	if err != nil {

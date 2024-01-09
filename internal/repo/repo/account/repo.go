@@ -66,9 +66,9 @@ SELECT id, user_id, name, bank, balance, created_at
 FROM accounts 
 WHERE 
 	user_id = {{.UserID}}
-	{{With .AccountIDs}} 
-		AND id IN ({{ join . "," }})
-	{{END}}
+	{{with .AccountIDs}} 
+		AND id IN ({{ joinInt32 . "," }})
+	{{end}}
 `
 
 func (r *Repository) ListAccounts(ctx context.Context, userID int32, accountIDs []int32) ([]db.Account, error) {

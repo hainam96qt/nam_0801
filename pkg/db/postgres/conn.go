@@ -17,7 +17,7 @@ type DatabaseConfig struct {
 }
 
 func ConnectDatabase(args DatabaseConfig) (*sql.DB, error) {
-	var con = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", args.Username, args.Password, args.Host, args.Port, args.DatabaseName)
+	var con = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", args.Username, args.Password, args.Host, args.Port, args.DatabaseName)
 	db, err := sql.Open("postgres", con)
 	if err != nil {
 		log.Print(err.Error())

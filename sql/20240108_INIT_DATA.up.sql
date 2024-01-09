@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS users;
+
 create table users (
     id SERIAL primary key,
     name text not null,
@@ -8,18 +10,22 @@ create table users (
 
 CREATE TYPE bank_name AS ENUM ('VCB', 'ACB', 'VIB');
 
+DROP TABLE IF EXISTS accounts;
+
 create table accounts (
     id SERIAL primary key,
     user_id int not null,
     name text not null,
     bank bank_name not null ,
-    balance FLOAT not null,
+    balance FLOAT not null default 0,
     created_at timestamp default current_timestamp not null
 );
 
 alter table accounts add foreign key (user_id) references users(id);
 
 CREATE TYPE transaction_type AS ENUM('withdraw','deposit');
+
+DROP TABLE IF EXISTS transactions;
 
 create table transactions(
     id SERIAL primary key,
