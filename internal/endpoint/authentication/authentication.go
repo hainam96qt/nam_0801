@@ -1,4 +1,4 @@
-package user
+package authentication
 
 import (
 	"context"
@@ -13,34 +13,34 @@ import (
 
 type (
 	Endpoint struct {
-		userSvc UserService
+		authSvc AuthenticationService
 	}
 
-	UserService interface {
-		CreateUser(ctx context.Context, req *model.CreateUserRequest) (*model.CreateUserResponse, error)
+	AuthenticationService interface {
+		Login(ctx context.Context, req *model.LoginRequest) (*model.LoginResponse2, error)
 	}
 )
 
-func InitUserHandler(r *chi.Mux, userSvc UserService) {
-	userEndpoint := &Endpoint{
-		userSvc: userSvc,
+func InitAuthenticationHandler(r *chi.Mux, authSvc AuthenticationService) {
+	authEndpoint := &Endpoint{
+		authSvc: authSvc,
 	}
-	r.Route("/api/users", func(r chi.Router) {
-		r.Post("/", userEndpoint.createUser)
+	r.Route("/", func(r chi.Router) {
+		r.Post("/api/login", authEndpoint.login)
 	})
 }
 
-func (e *Endpoint) createUser(w http.ResponseWriter, r *http.Request) {
+func (e *Endpoint) login(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	var req model.CreateUserRequest
+	var req model.LoginRequest
 	if err := request.DecodeJSON(ctx, r.Body, &req); err != nil {
 		log.Printf("read request body error: %s \n", err)
 		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
 		return
 	}
 
-	res, err := e.userSvc.CreateUser(ctx, &req)
+	res, err := e.authSvc.Login(ctx, &req)
 	if err != nil {
 		log.Printf("failed to create user: %s \n", err)
 		response.Error(w, err)

@@ -28,3 +28,12 @@ func (r *Repository) CreateUser(ctx context.Context, user db.CreateUserParams) (
 
 	return u, nil
 }
+
+func (r *Repository) GetUserByEmail(ctx context.Context, email string) (db.User, error) {
+	u, err := r.Query.GetUserByEmail(ctx, email)
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
