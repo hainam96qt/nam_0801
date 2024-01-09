@@ -17,15 +17,15 @@ services:
     volumes:
       - ~/volumes/postgres_db:/var/lib/postgres_db
 
-#  nam-0508:
-#    build:
-#      dockerfile: Dockerfile
-#    restart: on-failure
-#    container_name: nam-0508
-#    volumes:
-#      - ./config:/app/config
-#    hostname: nam-0508
-#    depends_on:
-#      - postgres-db
-#    ports:
-#      - "8000:8000"
+  nam-0508:
+    build:
+      dockerfile: Dockerfile
+    restart: on-failure
+    container_name: nam-0508
+    volumes:
+      - ./config:/app/config
+    hostname: nam-0508
+    depends_on:
+      - postgres-db
+    ports:
+      - "8000:8000"

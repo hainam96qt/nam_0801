@@ -95,12 +95,17 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const getAccountForUpdate = `-- name: GetAccountForUpdate :one
-SELECT id, user_id, name, bank, balance, created_at FROM accounts WHERE id = $1 FOR UPDATE
+const getAccount = `-- name: GetAccount :one
+SELECT id, user_id, name, bank, balance, created_at FROM accounts WHERE id = $1 and user_id = $2
 `
 
-func (q *Queries) GetAccountForUpdate(ctx context.Context, id int32) (Account, error) {
-	row := q.db.QueryRowContext(ctx, getAccountForUpdate, id)
+type GetAccountParams struct {
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+func (q *Queries) GetAccount(ctx context.Context, arg GetAccountParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccount, arg.ID, arg.UserID)
 	var i Account
 	err := row.Scan(
 		&i.ID,
@@ -111,6 +116,96 @@ func (q *Queries) GetAccountForUpdate(ctx context.Context, id int32) (Account, e
 		&i.CreatedAt,
 	)
 	return i, err
+}
+
+const getAccountForUpdate = `-- name: GetAccountForUpdate :one
+SELECT id, user_id, name, bank, balance, created_at FROM accounts WHERE id = $1 and user_id = $2 FOR UPDATE
+`
+
+type GetAccountForUpdateParams struct {
+	ID     int32 `json:"id"`
+	UserID int32 `json:"user_id"`
+}
+
+func (q *Queries) GetAccountForUpdate(ctx context.Context, arg GetAccountForUpdateParams) (Account, error) {
+	row := q.db.QueryRowContext(ctx, getAccountForUpdate, arg.ID, arg.UserID)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Bank,
+		&i.Balance,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
+const listAccounts = `-- name: ListAccounts :many
+SELECT id, user_id, name, bank, balance, created_at from accounts
+`
+
+func (q *Queries) ListAccounts(ctx context.Context) ([]Account, error) {
+	rows, err := q.db.QueryContext(ctx, listAccounts)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Account
+	for rows.Next() {
+		var i Account
+		if err := rows.Scan(
+			&i.ID,
+			&i.UserID,
+			&i.Name,
+			&i.Bank,
+			&i.Balance,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const listTransactions = `-- name: ListTransactions :many
+SELECT id, amount, account_id, transaction_type, created_at from transactions
+`
+
+func (q *Queries) ListTransactions(ctx context.Context) ([]Transaction, error) {
+	rows, err := q.db.QueryContext(ctx, listTransactions)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Transaction
+	for rows.Next() {
+		var i Transaction
+		if err := rows.Scan(
+			&i.ID,
+			&i.Amount,
+			&i.AccountID,
+			&i.TransactionType,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const updateAccountBalance = `-- name: UpdateAccountBalance :exec

@@ -7,9 +7,9 @@ import (
 	account3 "nam_0801/internal/endpoint/account"
 	transaction3 "nam_0801/internal/endpoint/transaction"
 	user3 "nam_0801/internal/endpoint/user"
-	account "nam_0801/internal/repo/account"
-	"nam_0801/internal/repo/transaction"
-	"nam_0801/internal/repo/user"
+	"nam_0801/internal/repo/repo/account"
+	"nam_0801/internal/repo/repo/transaction"
+	"nam_0801/internal/repo/repo/user"
 	account2 "nam_0801/internal/service/account"
 	transaction2 "nam_0801/internal/service/transaction"
 	user2 "nam_0801/internal/service/user"
@@ -22,7 +22,7 @@ import (
 	"github.com/go-chi/chi/v5"
 
 	configs "nam_0801/internal/config"
-	"nam_0801/pkg/db/mysql_db"
+	"nam_0801/pkg/db/postgres"
 )
 
 func main() {
@@ -74,7 +74,7 @@ func initHTTPServer(ctx context.Context, conf *configs.Config) (httpServer *http
 		w.Write([]byte("welcome"))
 	})
 
-	dbConn, err := mysql_db.ConnectDatabase(conf.Mysqldb)
+	dbConn, err := postgres.ConnectDatabase(conf.Postgres)
 	if err != nil {
 		log.Panicf("failed to connect database:: %s \n", err)
 		return

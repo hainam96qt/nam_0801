@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func (s *Service) CreateTransaction(ctx context.Context, req *model.CreateTransactionRequest) (*model.CreateTransactionResponse, error) {
+func (s *Service) CreateTransaction(ctx context.Context, userID int32, req *model.CreateTransactionRequest) (*model.CreateTransactionResponse, error) {
 	tx, err := s.DatabaseConn.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
 		return nil, err
@@ -29,9 +29,11 @@ func (s *Service) CreateTransaction(ctx context.Context, req *model.CreateTransa
 		}
 	}(tx)
 
-
 	// get account
-	account, err := s.accountRepo.GetWagerForUpdate(ctx, tx, req.AccountID)
+	account, err := s.accountRepo.GetAccountForUpdate(ctx, tx, db.GetAccountForUpdateParams{
+		ID:     req.AccountID,
+		UserID: userID,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -39,11 +41,11 @@ func (s *Service) CreateTransaction(ctx context.Context, req *model.CreateTransa
 	newAccountBalance := account.Balance
 	if req.TransactionType == db.TransactionTypeWithdraw {
 		newAccountBalance = account.Balance - req.Amount
- 	} else {
+	} else {
 		newAccountBalance = account.Balance + req.Amount
 	}
 
-	if newAccountBalance < 0 {
+	if req.Amount < 0 || newAccountBalance < 0 {
 		return nil, error2.NewXError("invalid amount", http.StatusBadRequest)
 	}
 
@@ -53,23 +55,30 @@ func (s *Service) CreateTransaction(ctx context.Context, req *model.CreateTransa
 		TransactionType: req.TransactionType,
 	}
 
-	a, err := s.transactionRepo.CreateTransaction(ctx, tx, newTrans)
+	t, err := s.transactionRepo.CreateTransaction(ctx, tx, newTrans)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.accountRepo.UpdateAccountBalance(ctx, tx, db.UpdateAccountBalanceParams{
+		Balance: newAccountBalance,
+		ID:      req.AccountID,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	return &model.CreateTransactionResponse{
-		Transaction: convertTransactionDBToAPI(a),
+		Transaction: convertTransactionDBToAPI(t, *account),
 	}, nil
 }
 
-func convertTransactionDBToAPI(trans db.Transaction) model.Transaction {
+func convertTransactionDBToAPI(trans db.Transaction, account db.Account) model.Transaction {
 	return model.Transaction{
-		ID:        trans.ID,
-		UserID:    trans.,
-		Name:      trans.Name,
-		Bank:      trans.Bank,
-		Balance:   trans.Balance,
-		CreatedAt: account.CreatedAt,
+		ID:              trans.ID,
+		AccountID:       account.ID,
+		Bank:            account.Bank,
+		Amount:          trans.Amount,
+		TransactionType: trans.TransactionType,
 	}
 }

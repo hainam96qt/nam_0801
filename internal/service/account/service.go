@@ -15,6 +15,8 @@ type (
 
 	AccountRepository interface {
 		CreateAccount(ctx context.Context, user db.CreateAccountParams) (db.Account, error)
+		GetAccount(ctx context.Context, arg db.GetAccountParams) (*db.Account, error)
+		ListAccounts(ctx context.Context, userID int32, accountIDs []int32) ([]db.Account, error)
 	}
 )
 

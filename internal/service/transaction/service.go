@@ -16,10 +16,13 @@ type (
 
 	TransactionRepository interface {
 		CreateTransaction(ctx context.Context, tx *sql.Tx, transaction db.CreateTransactionParams) (db.Transaction, error)
+		ListTransactions(ctx context.Context, userID int32, accountID *int32) ([]db.Transaction, error)
 	}
 
 	AccountRepository interface {
-		GetWagerForUpdate(ctx context.Context, tx *sql.Tx, accountID int32) (*db.Account, error)
+		GetAccountForUpdate(ctx context.Context, tx *sql.Tx, arg db.GetAccountForUpdateParams) (*db.Account, error)
+		UpdateAccountBalance(ctx context.Context, tx *sql.Tx, arg db.UpdateAccountBalanceParams) error
+		ListAccounts(ctx context.Context, userID int32, accountIDs []int32) ([]db.Account, error)
 	}
 )
 

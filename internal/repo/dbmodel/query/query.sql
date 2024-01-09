@@ -25,7 +25,16 @@ INSERT INTO transactions (
 ) RETURNING *;
 
 /* name: GetAccountForUpdate :one */
-SELECT * FROM accounts WHERE id = $1 FOR UPDATE;
+SELECT * FROM accounts WHERE id = $1 and user_id = $2 FOR UPDATE;
+
+/* name: GetAccount :one */
+SELECT * FROM accounts WHERE id = $1 and user_id = $2 ;
 
 /* name: UpdateAccountBalance :exec */
 UPDATE accounts SET balance = $1 where id = $2;
+
+/* name: ListAccounts :many */
+SELECT * from accounts;
+
+/* name: ListTransactions :many */
+SELECT * from transactions;

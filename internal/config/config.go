@@ -6,12 +6,12 @@ import (
 
 	"github.com/go-yaml/yaml"
 
-	"nam_0801/pkg/db/mysql_db"
+	"nam_0801/pkg/db/postgres"
 )
 
 type Config struct {
-	Mysqldb mysql_db.DatabaseConfig `yaml:"mysql"`
-	Server  Server                  `yaml:"server"`
+	Postgres postgres.DatabaseConfig `yaml:"postgres"`
+	Server   Server                  `yaml:"server"`
 }
 
 type Server struct {
