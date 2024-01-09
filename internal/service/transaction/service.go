@@ -6,6 +6,8 @@ import (
 	db "nam_0801/internal/repo/dbmodel"
 )
 
+//go:generate mockgen -source=service.go -destination=mock/transaction_service_mock.go
+
 type (
 	Service struct {
 		DatabaseConn *sql.DB

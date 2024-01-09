@@ -2,6 +2,7 @@ package model
 
 import (
 	db "nam_0801/internal/repo/dbmodel"
+	"time"
 )
 
 type Transaction struct {
@@ -10,6 +11,7 @@ type Transaction struct {
 	Bank            db.BankName        `json:"bank"`
 	Amount          float64            `json:"amount"`
 	TransactionType db.TransactionType `json:"transaction_type"`
+	CreatedAt       time.Time          `json:"created_at"`
 }
 
 type CreateTransactionRequest struct {

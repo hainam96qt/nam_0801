@@ -29,6 +29,10 @@ func (s *Service) CreateTransaction(ctx context.Context, userID int32, req *mode
 		}
 	}(tx)
 
+	if req.Amount < 0 {
+		return nil, error2.NewXError("invalid amount", http.StatusBadRequest)
+	}
+
 	// get account
 	account, err := s.accountRepo.GetAccountForUpdate(ctx, tx, db.GetAccountForUpdateParams{
 		ID:     req.AccountID,
@@ -45,8 +49,8 @@ func (s *Service) CreateTransaction(ctx context.Context, userID int32, req *mode
 		newAccountBalance = account.Balance + req.Amount
 	}
 
-	if req.Amount < 0 || newAccountBalance < 0 {
-		return nil, error2.NewXError("invalid amount", http.StatusBadRequest)
+	if newAccountBalance < 0 {
+		return nil, error2.NewXError("current balance not enough", http.StatusBadRequest)
 	}
 
 	newTrans := db.CreateTransactionParams{
@@ -80,5 +84,6 @@ func convertTransactionDBToAPI(trans db.Transaction, account db.Account) model.T
 		Bank:            account.Bank,
 		Amount:          trans.Amount,
 		TransactionType: trans.TransactionType,
+		CreatedAt:       trans.CreatedAt,
 	}
 }
