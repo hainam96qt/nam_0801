@@ -25,7 +25,7 @@ func InitUserHandler(r *chi.Mux, userSvc UserService) {
 	userEndpoint := &Endpoint{
 		userSvc: userSvc,
 	}
-	r.Route("/", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
 		r.Post("/users", userEndpoint.createUser)
 	})
 }

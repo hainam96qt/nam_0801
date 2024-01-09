@@ -28,7 +28,7 @@ func InitAccountHandler(r *chi.Mux, accountSvc AccountService) {
 	accountEndpoint := &Endpoint{
 		accountSvc: accountSvc,
 	}
-	r.Route("/users/{user_id}", func(r chi.Router) {
+	r.Route("/api/users/{user_id}", func(r chi.Router) {
 		r.Post("/accounts", accountEndpoint.createAccount)
 		r.Get("/accounts", accountEndpoint.listAccounts)
 		r.Get("/accounts/{account_id}", accountEndpoint.getAccounts)
