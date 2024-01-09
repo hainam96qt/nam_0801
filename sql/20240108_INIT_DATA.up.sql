@@ -7,6 +7,7 @@ create table users (
     password text not null,
     created_at timestamp default current_timestamp
 );
+CREATE UNIQUE INDEX user_email_idx ON users (email);
 
 CREATE TYPE bank_name AS ENUM ('VCB', 'ACB', 'VIB');
 

@@ -27,6 +27,12 @@ type Server struct {
 	SkipLogPaths         []string `yaml:"skipLoggingPaths"`
 	ResponseLogLimitByte int      `yaml:"responseLogLimitByte"`
 	UploadSizeLimitByte  int64    `yaml:"uploadSizeLimitByte"`
+	Token                Token    `yaml:"token"`
+}
+
+type Token struct {
+	JwtSecretKey  string        `yaml:"jwtSecretKey"`
+	TimeToExpired time.Duration `yaml:"timeToExpired"`
 }
 
 // NewConfig returns a new decoded Config struct

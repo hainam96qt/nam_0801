@@ -6,6 +6,7 @@ import (
 	"log"
 	"nam_0801/internal/model"
 	error2 "nam_0801/pkg/error"
+	"nam_0801/pkg/midleware"
 	"nam_0801/pkg/util/request"
 	"nam_0801/pkg/util/response"
 	"net/http"
@@ -27,9 +28,12 @@ func InitTransactionHandler(r *chi.Mux, transactionSvc TransactionService) {
 	transactionEndpoint := &Endpoint{
 		transactionSvc: transactionSvc,
 	}
-	r.Route("/api/users/{user_id}", func(r chi.Router) {
-		r.Get("/transactions", transactionEndpoint.ListTransactions)
-		r.Post("/transactions", transactionEndpoint.createTransaction)
+
+	r.Route("/api/users/{user_id}/transactions", func(r chi.Router) {
+		r.Use(midleware.Auth.ValidateRoleUser)
+
+		r.Get("/", transactionEndpoint.ListTransactions)
+		r.Post("/", transactionEndpoint.createTransaction)
 	})
 }
 
@@ -38,7 +42,15 @@ func (e *Endpoint) ListTransactions(w http.ResponseWriter, r *http.Request) {
 
 	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
-		log.Printf("failed to get query 'page' for list transactions: %s \n", err)
+		log.Printf("failed to get list transactions: %s \n", err)
+		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
+		return
+	}
+
+	userIDCtx := ctx.Value("UserID").(int32)
+	if userIDCtx != int32(userID) {
+		err := error2.NewXError("user can not access info in other user", http.StatusUnauthorized)
+		log.Printf("failed to get list transactions: %s \n", err)
 		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
 		return
 	}
@@ -70,6 +82,14 @@ func (e *Endpoint) createTransaction(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.Atoi(chi.URLParam(r, "user_id"))
 	if err != nil {
 		log.Printf("failed to get query 'page' for create transaction: %s \n", err)
+		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
+		return
+	}
+
+	userIDCtx := ctx.Value("UserID").(int32)
+	if userIDCtx != int32(userID) {
+		err := error2.NewXError("user can not access info in other user", http.StatusUnauthorized)
+		log.Printf("failed to get list transactions: %s \n", err)
 		response.Error(w, error2.NewXError(err.Error(), http.StatusBadRequest))
 		return
 	}

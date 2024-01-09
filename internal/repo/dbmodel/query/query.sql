@@ -31,6 +31,9 @@ SELECT * FROM accounts WHERE id = $1 and user_id = $2 FOR UPDATE;
 /* name: GetAccount :one */
 SELECT * FROM accounts WHERE id = $1 and user_id = $2 ;
 
+/* name: GetUserByEmail :one */
+SELECT * FROM users WHERE email = $1 ;
+
 /* name: UpdateAccountBalance :exec */
 UPDATE accounts SET balance = $1 where id = $2;
 

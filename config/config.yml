@@ -16,9 +16,12 @@ server:
       - X-Request-Id
   responseLogLimitByte: 10000
   uploadSizeLimitByte: 5242880
+  token:
+    jwtSecretKey: "abc123"
+    timeToExpired: "6000s"
 
 postgres:
-  host: localhost
+  host: postgres-db
   port: 5432
   database: namdb
   user: user
